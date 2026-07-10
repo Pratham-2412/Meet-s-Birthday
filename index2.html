@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 2 — The Secret Workshop of Memories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+:root{
+  --royal:#1e2f7a;
+  --royal-deep:#0c1440;
+  --sky:#5ecbf5;
+  --gold:#ffc93c;
+  --purple:#b389e8;
+  --orange:#ff9e5e;
+  --white:#fbfbff;
+  --glass:rgba(255,255,255,0.06);
+  --font-display:'Fredoka', sans-serif;
+  --font-body:'Quicksand', sans-serif;
+  --font-mono:'Space Mono', monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{
+  width:100%; height:100%; overflow-x:hidden;
+  background: radial-gradient(ellipse at 50% 0%, #16215e 0%, var(--royal-deep) 55%, #060a26 100%);
+  color:var(--white);
+  font-family:var(--font-body);
+  cursor:default;
+}
+button{font-family:var(--font-body); cursor:pointer; border:none; background:none; color:inherit;}
+.hidden{display:none !important;}
+#app{position:relative; width:100%; min-height:100vh; overflow:hidden;}
+
+/* ---------- AMBIENT BACKGROUND ---------- */
+#bg-layer{position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;}
+.cloud{position:absolute; opacity:0.5; filter:blur(1px);}
+.cloud svg{width:100%; height:100%;}
+.star{position:absolute; width:3px; height:3px; background:var(--white); border-radius:50%; box-shadow:0 0 6px 2px rgba(255,255,255,0.8);}
+.ray{position:absolute; background:linear-gradient(180deg, rgba(255,201,60,0.12), transparent); width:180px; height:900px; transform-origin:top center; filter:blur(6px);}
+.sparkle{position:absolute; width:5px; height:5px; background:var(--gold); border-radius:50%; box-shadow:0 0 8px 3px rgba(255,201,60,0.7);}
+.gear{position:absolute; opacity:0.35;}
+.float-book{position:absolute; width:34px; height:26px; background:linear-gradient(135deg,var(--purple),var(--royal)); border-radius:3px 8px 8px 3px; opacity:0.55; box-shadow: -3px 0 0 var(--white);}
+.paper-plane{position:absolute; width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-bottom:26px solid rgba(255,255,255,0.5); opacity:0.6;}
+.balloon{position:absolute; width:22px; height:28px; border-radius:50% 50% 50% 50%/60% 60% 40% 40%; opacity:0.55;}
+.mini-clock{position:absolute; width:30px; height:30px; border-radius:50%; border:2px solid var(--gold); opacity:0.5;}
+.window-glow{position:absolute; width:46px; height:60px; border-radius:6px; background:radial-gradient(circle, rgba(255,201,60,0.55), rgba(255,201,60,0.05)); opacity:0.5;}
+
+/* ---------- MUSIC CONTROLLER ---------- */
+#music-controller{
+  position:fixed; bottom:22px; right:22px; z-index:50;
+}
+#btn-play{
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg, rgba(30,47,122,0.9), rgba(12,20,64,0.95));
+  border:1px solid rgba(255,201,60,0.4);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+  backdrop-filter:blur(10px); box-shadow:0 8px 26px rgba(0,0,0,0.4);
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+#btn-play:hover{transform:scale(1.06);}
+#btn-play.playing{
+  background:linear-gradient(135deg, var(--gold), #ffe08a); color:var(--royal-deep);
+  box-shadow:0 0 0 4px rgba(255,201,60,0.18), 0 8px 26px rgba(255,201,60,0.4);
+}
+
+/* ---------- SCENES ---------- */
+.scene{position:relative; z-index:2; min-height:100vh; width:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:40px 20px; text-align:center;}
+
+/* DOOR INTRO */
+#scene-door{min-height:100vh;}
+.door-frame{position:relative; width:min(320px, 70vw); height:min(440px, 60vh); perspective:1400px;}
+.door-opening{position:absolute; inset:6px; border-radius:6px 6px 2px 2px; background:radial-gradient(circle at 50% 45%, rgba(255,201,60,0.9), rgba(255,201,60,0.25) 55%, transparent 80%); opacity:0; filter:blur(2px);}
+.door{
+  position:absolute; inset:0; background:linear-gradient(135deg,#5a3a1e,#7a5228 40%, #4a2f16);
+  border-radius:10px 10px 4px 4px; box-shadow:0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.3);
+  transform-origin:left center; border:6px solid #3a2410; z-index:2;
+}
+.door::before{content:''; position:absolute; inset:14px; border:2px solid rgba(255,201,60,0.25); border-radius:6px;}
+.door-knob{position:absolute; right:22px; top:50%; width:14px; height:14px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold);}
+.knock-text{margin-top:26px; font-family:var(--font-mono); letter-spacing:3px; color:var(--gold); font-size:14px; opacity:0;}
+#door-hint{margin-top:20px; font-family:var(--font-display); font-size:15px; color:var(--sky); letter-spacing:1px; opacity:0.85;}
+.door-rays{position:absolute; inset:6px; z-index:1; overflow:hidden; border-radius:6px; opacity:0;}
+.door-ray{position:absolute; top:50%; left:50%; width:6px; height:260%; background:linear-gradient(180deg, rgba(255,255,255,0), rgba(255,236,170,0.85), rgba(255,255,255,0)); transform-origin:top center;}
+.door-gif-wrap{
+  position:absolute; left:-8%; bottom:-6%; width:min(190px, 42vw); height:min(190px, 42vw); opacity:0;
+  filter:drop-shadow(0 14px 26px rgba(0,0,0,0.45)); z-index:3; pointer-events:none;
+  border-radius:16px; overflow:hidden; border:3px solid rgba(255,201,60,0.3);
+}
+.door-gif-wrap img{width:100%; height:100%; object-fit:cover; display:block;}
+
+/* DIALOGUE BOX */
+.dialogue-box{
+  position:relative; max-width:520px; margin:24px auto 0; padding:20px 26px;
+  background:var(--glass); border:1px solid rgba(255,255,255,0.15); border-radius:18px;
+  backdrop-filter:blur(8px); font-family:var(--font-display); font-size:16px; line-height:1.6;
+  opacity:0; box-shadow:0 10px 40px rgba(0,0,0,0.3);
+}
+.confetti-piece{position:absolute; width:8px; height:8px; opacity:0.9;}
+
+/* GENERIC BUTTON */
+.btn-primary{
+  margin-top:26px; padding:14px 34px; border-radius:40px; font-family:var(--font-display);
+  font-size:15px; letter-spacing:0.5px; color:var(--royal-deep);
+  background:linear-gradient(135deg, var(--gold), #ffe08a);
+  box-shadow:0 8px 24px rgba(255,201,60,0.35); font-weight:600;
+  transition:transform .25s ease, box-shadow .25s ease;
+}
+.btn-primary:hover{transform:translateY(-3px) scale(1.03); box-shadow:0 14px 34px rgba(255,201,60,0.5);}
+
+/* SCENE 1 - MEMORY MACHINE */
+#scene-machine{}
+.machine-wrap{position:relative; width:min(360px,80vw); height:340px; margin:20px auto;}
+.machine-body{position:absolute; inset:0; background:linear-gradient(160deg, #223a9c, #14225c); border-radius:24px; border:4px solid rgba(255,201,60,0.3); box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.machine-glass{position:absolute; left:20%; top:16%; width:60%; height:44%; border-radius:50%; background:radial-gradient(circle, rgba(94,203,245,0.15), rgba(94,203,245,0.02)); border:3px solid rgba(94,203,245,0.4); overflow:hidden;}
+.machine-fill{position:absolute; bottom:0; left:0; width:100%; height:0%; background:linear-gradient(180deg, var(--gold), var(--orange)); transition:height 0.4s ease; opacity:0.85;}
+.machine-label{position:absolute; bottom:14%; left:0; right:0; text-align:center; font-family:var(--font-mono); font-size:11px; letter-spacing:2px; color:var(--gold);}
+.gear-icon{position:absolute; width:40px; height:40px; opacity:0.7;}
+#bubble-field{position:relative; width:min(600px,92vw); height:340px; margin:10px auto 0; border-radius:20px; background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.15); overflow:hidden;}
+.bubble{
+  position:absolute; width:52px; height:52px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, rgba(255,255,255,0.9), rgba(94,203,245,0.35));
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+  box-shadow:0 0 16px rgba(94,203,245,0.5); cursor:pointer; user-select:none;
+  animation:bob 3.5s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)}}
+#counter-badge{position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.35); padding:6px 14px; border-radius:20px; font-family:var(--font-mono); font-size:13px; color:var(--gold); z-index:5;}
+.memory-msg{
+  position:absolute; max-width:220px; padding:10px 16px; border-radius:14px;
+  background:linear-gradient(135deg, rgba(255,201,60,0.95), rgba(255,224,138,0.95));
+  color:var(--royal-deep); font-family:var(--font-display); font-size:12.5px; line-height:1.4;
+  box-shadow:0 10px 26px rgba(0,0,0,0.35); z-index:6; pointer-events:none; text-align:center;
+}
+
+/* CARDS / VAULT */
+.vault-cards{display:flex; gap:28px; flex-wrap:wrap; justify-content:center; margin-top:20px;}
+.crystal-card{
+  width:200px; height:270px; position:relative; cursor:pointer; perspective:1200px;
+}
+.crystal-card .inner{position:relative; width:100%; height:100%; transition:transform 0.8s cubic-bezier(.2,.8,.2,1); transform-style:preserve-3d;}
+.crystal-card.flipped .inner{transform:rotateY(180deg);}
+.crystal-face{position:absolute; inset:0; border-radius:18px; backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px;}
+.crystal-front{background:linear-gradient(160deg, rgba(94,203,245,0.15), rgba(30,47,122,0.6)); border:2px solid rgba(94,203,245,0.5); box-shadow:0 0 30px rgba(94,203,245,0.25), inset 0 0 30px rgba(94,203,245,0.1);}
+.crystal-front .num{font-family:var(--font-display); font-size:54px; color:var(--sky); text-shadow:0 0 20px rgba(94,203,245,0.7);}
+.crystal-back{background:linear-gradient(160deg, rgba(255,201,60,0.18), rgba(30,47,122,0.7)); border:2px solid rgba(255,201,60,0.5); transform:rotateY(180deg); box-shadow:0 0 30px rgba(255,201,60,0.25);}
+.crystal-back .gift-title{font-family:var(--font-display); font-size:16px; color:var(--gold); margin-bottom:8px;}
+.crystal-back .gift-desc{font-size:12px; line-height:1.5; opacity:0.9; margin-bottom:10px;}
+.crystal-back .gift-quote{font-size:11px; font-style:italic; color:var(--purple); opacity:0.9;}
+
+/* LETTER */
+.letter-paper{
+  max-width:520px; margin:20px auto; background:#fbf3df; color:#2c2416; border-radius:6px;
+  padding:36px 30px; box-shadow:0 20px 60px rgba(0,0,0,0.5); text-align:left; font-family:'Quicksand', sans-serif;
+  transform-origin:top center;
+}
+.letter-paper p{margin-bottom:14px; font-size:15px; line-height:1.7; opacity:0;}
+.letter-paper .sign{font-family:var(--font-display); text-align:right; margin-top:20px; color:var(--royal);}
+
+/* SECRET DOOR */
+#secret-door{
+  position:fixed; width:26px; height:36px; border-radius:4px 4px 0 0;
+  background:linear-gradient(135deg,#7a5228,#4a2f16); border:2px solid #3a2410; opacity:0.5;
+  z-index:30; box-shadow:0 0 10px rgba(255,201,60,0.4);
+}
+#badge-toast{
+  position:fixed; top:24px; left:50%; transform:translate(-50%,-140%); z-index:60;
+  background:linear-gradient(135deg,var(--gold),#ffe08a); color:var(--royal-deep);
+  padding:14px 26px; border-radius:16px; font-family:var(--font-display); font-weight:600;
+  box-shadow:0 10px 30px rgba(255,201,60,0.5); transition:transform .5s cubic-bezier(.2,.9,.3,1.3);
+}
+#badge-toast.show{transform:translate(-50%,0);}
+
+/* HUG */
+.hug-btn{margin-top:30px;}
+.hug-gif-wrap{
+  width:min(220px, 55vw); height:min(220px, 55vw); margin:18px auto 6px;
+  border-radius:20px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.45);
+  border:3px solid rgba(255,201,60,0.35); opacity:0;
+}
+.hug-gif-wrap img{width:100%; height:100%; object-fit:cover; display:block;}
+.heart{position:absolute; font-size:20px; opacity:0;}
+
+/* ENDING */
+#scene-end h1{font-family:var(--font-display); font-size:clamp(32px,6vw,56px); color:var(--gold); text-shadow:0 0 30px rgba(255,201,60,0.5); letter-spacing:2px;}
+#scene-end .sub{margin-top:14px; font-size:15px; opacity:0.85; max-width:420px;}
+.section-title{font-family:var(--font-display); font-size:clamp(22px,4vw,32px); color:var(--white); margin-bottom:6px; letter-spacing:0.5px;}
+.section-eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:3px; color:var(--sky); opacity:0.8; margin-bottom:10px;}
+.fade-black{position:fixed; inset:0; background:#000; z-index:100; opacity:0; pointer-events:none;}
+#end-star{font-size:40px; filter:drop-shadow(0 0 20px rgba(255,201,60,0.7)); margin-bottom:8px;}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:640px){
+  .scene{padding:28px 14px;}
+  .section-title{font-size:22px;}
+  .dialogue-box{padding:16px 18px; font-size:14px; max-width:92vw;}
+  .door-frame{width:78vw; height:50vh;}
+  .door-gif-wrap{width:34vw; height:34vw; left:-6%; bottom:-4%;}
+  #music-controller{bottom:14px; right:14px;}
+  #btn-play{width:44px; height:44px; font-size:16px;}
+  .machine-wrap{width:88vw; height:260px;}
+  #bubble-field{width:94vw; height:280px;}
+  .bubble{width:44px; height:44px; font-size:18px;}
+  .memory-msg{max-width:70vw; font-size:11.5px; padding:8px 12px;}
+  .vault-cards{gap:16px;}
+  .crystal-card{width:44vw; height:220px; max-width:200px;}
+  .crystal-front .num{font-size:40px;}
+  .letter-paper{padding:24px 18px; max-width:92vw;}
+  .letter-paper p{font-size:13.5px;}
+  #scene-end h1{font-size:30px;}
+}
+@media (max-width:400px){
+  .crystal-card{width:80vw; height:210px;}
+  .vault-cards{flex-direction:column; align-items:center;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="bg-layer"></div>
+
+  <!-- MUSIC CONTROLLER -->
+  <div id="music-controller">
+    <button id="btn-play" title="Play/Pause music">▶</button>
+  </div>
+
+  <!-- SECRET ANYWHERE DOOR (hidden somewhere on page) -->
+  <div id="secret-door" title=""></div>
+  <div id="badge-toast">✨ Achievement Unlocked — Explorer Level 2</div>
+  <div class="fade-black" id="fade-black"></div>
+
+  <!-- SCENE: DOOR INTRO -->
+  <section class="scene" id="scene-door">
+    <div class="section-eyebrow">DAY 2 · 5 DAYS TO GO</div>
+    <div class="section-title">The Secret Workshop of Memories</div>
+    <div class="door-frame">
+      <div class="door-opening" id="door-opening"></div>
+      <div class="door-rays" id="door-rays"></div>
+      <div class="door" id="door">
+        <div class="door-knob"></div>
+      </div>
+      <div class="door-gif-wrap" id="door-gif-wrap">
+        <!-- Replace src below with your own hosted gif -->
+        <img src="img4.gif" alt="cute waving animation">
+      </div>
+    </div>
+    <div class="knock-text" id="knock-text">knock&nbsp;&nbsp;·&nbsp;&nbsp;knock&nbsp;&nbsp;·&nbsp;&nbsp;knock</div>
+    <div class="dialogue-box" id="dialogue-1">
+      "Hey Meet!! You actually came back! I knew you would."<br><br>
+      "I've been working all night. Come inside."
+    </div>
+    <div id="door-hint" class="hidden">Tap the door to knock</div>
+    <button class="btn-primary hidden" id="btn-enter">Step Inside →</button>
+  </section>
+
+  <!-- SCENE 1: MEMORY MACHINE -->
+  <section class="scene hidden" id="scene-machine">
+    <div class="section-eyebrow">SCENE 1</div>
+    <div class="section-title">The Memory Machine</div>
+    <div class="dialogue-box" style="opacity:1;">"We need happy energy. Help me collect 7 happy memories."</div>
+    <div class="machine-wrap">
+      <div class="machine-body">
+        <div class="machine-glass"><div class="machine-fill" id="machine-fill"></div></div>
+        <div class="machine-label">MEMORY MAKER 3000</div>
+      </div>
+    </div>
+    <div id="bubble-field">
+      <div id="counter-badge">0 / 7</div>
+    </div>
+    <button class="btn-primary hidden" id="btn-reward">Collect Reward →</button>
+  </section>
+
+  <!-- REWARD -->
+  <section class="scene hidden" id="scene-reward">
+    <div class="section-eyebrow">TODAY'S REWARD</div>
+    <div class="section-title" style="color:var(--gold);">✦ Memory Pass ✦</div>
+    <div class="dialogue-box" style="opacity:1;">A glowing golden ticket, printed fresh from the Memory Maker 3000.</div>
+    <button class="btn-primary" id="btn-elevator">Enter the Hidden Elevator →</button>
+  </section>
+
+  <!-- SCENE 2: GIFT VAULT -->
+  <section class="scene hidden" id="scene-vault">
+    <div class="section-eyebrow">SCENE 2</div>
+    <div class="section-title">The Gift Vault</div>
+    <div class="dialogue-box" style="opacity:1;">Tap each crystal to unlock today's cards.</div>
+    <div class="vault-cards">
+      <div class="crystal-card" data-num="2">
+        <div class="inner">
+          <div class="crystal-face crystal-front"><div class="num">2</div></div>
+          <div class="crystal-face crystal-back">
+            <div class="gift-title">The Smile Collector</div>
+            <div class="gift-desc">Every smile you share becomes someone's favorite memory.</div>
+            <div class="gift-quote">"A smile costs nothing but can change everything."</div>
+          </div>
+        </div>
+      </div>
+      <div class="crystal-card" data-num="8">
+        <div class="inner">
+          <div class="crystal-face crystal-front"><div class="num">8</div></div>
+          <div class="crystal-face crystal-back">
+            <div class="gift-title">The Silent Strength</div>
+            <div class="gift-desc">You don't always realize how strong you are until someone else reminds you.</div>
+            <div class="gift-quote">"Real strength is often quiet."</div>
+          </div>
+        </div>
+      </div>
+      <div class="crystal-card" data-num="17">
+        <div class="inner">
+          <div class="crystal-face crystal-front"><div class="num">17</div></div>
+          <div class="crystal-face crystal-back">
+            <div class="gift-title">Dream Builder</div>
+            <div class="gift-desc">Keep chasing the things that make your heart feel alive.</div>
+            <div class="gift-quote">"Dreams become reality one step at a time."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary hidden" id="btn-letter">Read Today's Letter →</button>
+  </section>
+
+  <!-- LETTER -->
+  <section class="scene hidden" id="scene-letter">
+    <div class="letter-paper" id="letter-paper">
+      <p>Dear Meet,</p>
+      <p>Welcome back.</p>
+      <p>Yesterday we started something special.</p>
+      <p>Today I wanted to remind you that life isn't only about reaching the destination.</p>
+      <p>Sometimes the little moments before it become the most unforgettable.</p>
+      <p>Thank you for coming back.</p>
+      <p>Tomorrow another little surprise will be waiting.</p>
+      <p class="sign">— Kasturi</p>
+    </div>
+    <button class="btn-primary hidden hug-btn" id="btn-to-hug">Continue →</button>
+  </section>
+
+  <!-- HUG PAGE -->
+  <section class="scene hidden" id="scene-hug">
+    <div class="section-eyebrow">ONE LAST THING</div>
+    <div class="section-title">A Hug Before You Go</div>
+    <div class="hug-gif-wrap" id="hug-gif-wrap">
+      <img src="img5.gif" alt="hug animation">
+    </div>
+    <div class="dialogue-box" style="opacity:1;">"Come here... you deserve this. 🤗"</div>
+    <button class="btn-primary hug-btn" id="btn-hug">Receive Today's Hug 🤗</button>
+  </section>
+
+  <!-- ENDING -->
+  <section class="scene hidden" id="scene-end">
+    <div id="end-star">⭐</div> 
+    <h1>5 DAYS TO GO</h1>
+    <div class="sub">Another chapter has been completed. Tomorrow, a completely new adventure will begin.</div>
+  </section>
+
+</div>
+
+<script>
+/* ============ BACKGROUND AMBIENCE ============ */
+const bg = document.getElementById('bg-layer');
+function rand(min,max){return Math.random()*(max-min)+min;}
+
+for(let i=0;i<40;i++){
+  const s=document.createElement('div'); s.className='star';
+  s.style.left=rand(0,100)+'%'; s.style.top=rand(0,100)+'%';
+  bg.appendChild(s);
+  gsap.to(s,{opacity:rand(0.2,1), duration:rand(1.5,3.5), repeat:-1, yoyo:true, delay:rand(0,3)});
+}
+for(let i=0;i<10;i++){
+  const sp=document.createElement('div'); sp.className='sparkle';
+  sp.style.left=rand(0,100)+'%'; sp.style.top=rand(0,100)+'%';
+  bg.appendChild(sp);
+  gsap.to(sp,{y:-30, opacity:0, duration:rand(2,4), repeat:-1, delay:rand(0,3), ease:'power1.out'});
+}
+for(let i=0;i<5;i++){
+  const b=document.createElement('div'); b.className='float-book';
+  b.style.left=rand(0,90)+'%'; b.style.top=rand(0,90)+'%';
+  bg.appendChild(b);
+  gsap.to(b,{y:-20, rotation:rand(-10,10), duration:rand(3,5), repeat:-1, yoyo:true, ease:'sine.inOut'});
+}
+for(let i=0;i<4;i++){
+  const p=document.createElement('div'); p.className='paper-plane';
+  p.style.left='-40px'; p.style.top=rand(5,80)+'%';
+  bg.appendChild(p);
+  gsap.to(p,{x:'110vw', y:rand(-60,60), rotation:rand(-15,15), duration:rand(10,16), repeat:-1, delay:rand(0,10), ease:'none'});
+}
+const balloonColors=['var(--gold)','var(--sky)','var(--purple)','var(--orange)'];
+for(let i=0;i<6;i++){
+  const bl=document.createElement('div'); bl.className='balloon';
+  bl.style.left=rand(0,95)+'%'; bl.style.top=rand(20,100)+'%';
+  bl.style.background=balloonColors[i%4];
+  bg.appendChild(bl);
+  gsap.to(bl,{y:-25, x:rand(-10,10), duration:rand(3,6), repeat:-1, yoyo:true, ease:'sine.inOut'});
+}
+for(let i=0;i<3;i++){
+  const c=document.createElement('div'); c.className='mini-clock';
+  c.style.left=rand(0,90)+'%'; c.style.top=rand(0,90)+'%';
+  bg.appendChild(c);
+  gsap.to(c,{rotation:360, duration:rand(15,25), repeat:-1, ease:'linear'});
+}
+for(let i=0;i<4;i++){
+  const w=document.createElement('div'); w.className='window-glow';
+  w.style.left=rand(0,90)+'%'; w.style.top=rand(0,80)+'%';
+  bg.appendChild(w);
+  gsap.to(w,{opacity:rand(0.3,0.8), duration:rand(2,4), repeat:-1, yoyo:true});
+}
+for(let i=0;i<3;i++){
+  const r=document.createElement('div'); r.className='ray';
+  r.style.left=rand(0,90)+'%'; r.style.top='-100px'; r.style.rotation=rand(-10,10)+'deg';
+  bg.appendChild(r);
+  gsap.to(r,{opacity:0.5, duration:rand(3,5), repeat:-1, yoyo:true});
+}
+
+/* ============ MUSIC CONTROLLER (single circle toggle) ============ */
+let audioCtx=null, osc=null, gainNode=null, playing=false;
+const FIXED_VOLUME=0.15;
+function ensureAudio(){
+  if(!audioCtx){ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }
+}
+const btnPlay=document.getElementById('btn-play');
+btnPlay.addEventListener('click', ()=>{
+  ensureAudio();
+  playing=!playing;
+  btnPlay.textContent = playing ? '⏸' : '▶';
+  btnPlay.classList.toggle('playing', playing);
+  if(playing){
+    gainNode=audioCtx.createGain();
+    gainNode.gain.value=FIXED_VOLUME;
+    gainNode.connect(audioCtx.destination);
+    osc=audioCtx.createOscillator(); osc.type='sine'; osc.frequency.value=523.25;
+    osc.connect(gainNode); osc.start();
+    gsap.to(osc.frequency,{value:659.25, duration:1.4, repeat:-1, yoyo:true, ease:'sine.inOut'});
+  } else if(osc){ osc.stop(); osc=null; }
+});
+
+/* ============ SECRET DOOR PLACEMENT ============ */
+const secretDoor=document.getElementById('secret-door');
+function placeSecretDoor(){
+  secretDoor.style.left = rand(5,90)+'vw';
+  secretDoor.style.top = rand(15,85)+'vh';
+}
+placeSecretDoor();
+let secretFound=false;
+secretDoor.addEventListener('click', ()=>{
+  if(secretFound) return;
+  secretFound=true;
+  const toast=document.getElementById('badge-toast');
+  toast.classList.add('show');
+  gsap.to(secretDoor,{scale:0, opacity:0, duration:.4});
+  setTimeout(()=>toast.classList.remove('show'), 3200);
+});
+gsap.to(secretDoor,{opacity:1, duration:1.2, repeat:-1, yoyo:true});
+
+/* ============ DOOR INTRO SEQUENCE ============ */
+const door=document.getElementById('door');
+const doorOpening=document.getElementById('door-opening');
+const doorRays=document.getElementById('door-rays');
+const knockText=document.getElementById('knock-text');
+const dialogue1=document.getElementById('dialogue-1');
+const doorHint=document.getElementById('door-hint');
+const btnEnter=document.getElementById('btn-enter');
+const doorGif=document.getElementById('door-gif-wrap');
+
+// build light rays inside the door opening
+for(let i=0;i<7;i++){
+  const r=document.createElement('div'); r.className='door-ray';
+  r.style.transform=`translate(-50%,-50%) rotate(${i*(360/7)}deg)`;
+  doorRays.appendChild(r);
+}
+
+let knocks=0;
+gsap.set(dialogue1,{opacity:0, y:20});
+
+function introReady(){
+  const tl=gsap.timeline();
+  tl.to(doorOpening,{opacity:1, duration:.5}, 0)
+    .to(doorRays,{opacity:1, duration:.4}, 0.1)
+    .to(doorRays,{rotation:60, duration:3, ease:'none'}, 0.1)
+    .to(door,{rotationY:-70, x:-4, duration:1.3, ease:'power3.out', transformOrigin:'left center'}, 0.15)
+    .to(doorGif,{opacity:1, y:0, duration:.5, ease:'back.out(1.5)'}, 0.7)
+    .to(dialogue1,{opacity:1, y:0, duration:.6}, 1.0)
+    .call(()=>{
+      btnEnter.classList.remove('hidden');
+      gsap.from(btnEnter,{opacity:0,y:10,duration:.5});
+    }, null, 1.4);
+}
+
+door.addEventListener('click', ()=>{
+  if(knocks>=3) return;
+  knocks++;
+  gsap.fromTo(door,{x:0},{x:-6,duration:.05,yoyo:true,repeat:3});
+  knockText.style.opacity=1;
+  gsap.fromTo(knockText,{opacity:0.3},{opacity:1,duration:.15});
+  if(knocks===1) doorHint.classList.add('hidden');
+  if(knocks>=3){ setTimeout(introReady, 400); }
+});
+setTimeout(()=>{ doorHint.classList.remove('hidden'); gsap.from(doorHint,{opacity:0,duration:.8}); }, 800);
+
+btnEnter.addEventListener('click', ()=>{
+  gsap.to('#scene-door',{opacity:0, duration:.6, onComplete:()=>{
+    document.getElementById('scene-door').classList.add('hidden');
+    document.getElementById('scene-machine').classList.remove('hidden');
+    gsap.from('#scene-machine',{opacity:0, duration:.8});
+    startMiniGame();
+  }});
+});
+
+/* ============ MINI GAME: COLLECT 7 MEMORY BUBBLES ============ */
+const memoryItems=[
+  {icon:'⚽', msg:'The day we played until the sun went down.'},
+  {icon:'☕', msg:'Quiet mornings are memories too.'},
+  {icon:'🌅', msg:'Every sunrise is a fresh page for us.'},
+  {icon:'📷', msg:'A moment you never wanted to forget.'},
+  {icon:'🎂', msg:'Celebrations always feel sweeter together.'},
+  {icon:'🎵', msg:'That one song still brings it all back.'},
+  {icon:'😊', msg:'Your smile — the best memory of them all.'}
+];
+const bubbleField=document.getElementById('bubble-field');
+const counterBadge=document.getElementById('counter-badge');
+const machineFill=document.getElementById('machine-fill');
+const btnReward=document.getElementById('btn-reward');
+const TOTAL_ITEMS=memoryItems.length;
+let collected=0;
+let gameActive=false;
+let queue=[];
+
+function resetQueue(){ queue=[...memoryItems]; }
+resetQueue();
+
+function showMemoryMessage(text, x, y){
+  const m=document.createElement('div');
+  m.className='memory-msg';
+  m.textContent=text;
+  m.style.left=Math.max(10, Math.min(x-100, bubbleField.clientWidth-230))+'px';
+  m.style.top=Math.max(0, y-60)+'px';
+  bubbleField.appendChild(m);
+  gsap.fromTo(m,{opacity:0, y:10, scale:.9},{opacity:1, y:0, scale:1, duration:.35, ease:'back.out(1.6)'});
+  gsap.to(m,{opacity:0, y:-14, duration:.5, delay:1.6, onComplete:()=>m.remove()});
+}
+
+function spawnBubble(){
+  if(!gameActive || collected>=TOTAL_ITEMS || queue.length===0) return;
+  const item = queue.splice(Math.floor(rand(0,queue.length)),1)[0];
+  const b=document.createElement('div');
+  b.className='bubble';
+  b.textContent=item.icon;
+  const fw=bubbleField.clientWidth, fh=bubbleField.clientHeight;
+  const bx=rand(10,fw-60), by=rand(10,fh-60);
+  b.style.left=bx+'px';
+  b.style.top=by+'px';
+  bubbleField.appendChild(b);
+  b.addEventListener('click', ()=>{
+    collected++;
+    counterBadge.textContent=`${collected} / ${TOTAL_ITEMS}`;
+    machineFill.style.height=(collected/TOTAL_ITEMS*100)+'%';
+    showMemoryMessage(item.msg, bx, by);
+    gsap.to(b,{scale:0, opacity:0, duration:.3, onComplete:()=>b.remove()});
+    if(collected>=TOTAL_ITEMS){
+      gameActive=false;
+      setTimeout(celebrateMachine, 900);
+    }
+  });
+}
+function startMiniGame(){
+  gameActive=true;
+  resetQueue();
+  const interval=setInterval(()=>{
+    if(!gameActive){ clearInterval(interval); return; }
+    if(bubbleField.querySelectorAll('.bubble').length<3 && collected+bubbleField.querySelectorAll('.bubble').length<TOTAL_ITEMS){
+      spawnBubble();
+    }
+  }, 700);
+}
+function celebrateMachine(){
+  gsap.to('.machine-body',{boxShadow:'0 0 80px rgba(255,201,60,0.8)', duration:.6, yoyo:true, repeat:3});
+  for(let i=0;i<24;i++){
+    const p=document.createElement('div');
+    p.style.position='absolute'; p.style.width='6px'; p.style.height='6px';
+    p.style.background=['#ffc93c','#5ecbf5','#b389e8','#ff9e5e'][i%4];
+    p.style.left='50%'; p.style.top='30%'; p.style.borderRadius='50%';
+    bubbleField.appendChild(p);
+    gsap.to(p,{x:rand(-150,150), y:rand(-150,50), opacity:0, duration:rand(1,1.8), ease:'power2.out', onComplete:()=>p.remove()});
+  }
+  setTimeout(()=>{ btnReward.classList.remove('hidden'); gsap.from(btnReward,{opacity:0,y:10,duration:.5}); }, 900);
+}
+
+btnReward.addEventListener('click', ()=>{
+  gsap.to('#scene-machine',{opacity:0, duration:.5, onComplete:()=>{
+    document.getElementById('scene-machine').classList.add('hidden');
+    document.getElementById('scene-reward').classList.remove('hidden');
+    gsap.from('#scene-reward',{opacity:0, y:20, duration:.7});
+  }});
+});
+
+document.getElementById('btn-elevator').addEventListener('click', ()=>{
+  gsap.to('#scene-reward',{opacity:0, y:-30, duration:.6, onComplete:()=>{
+    document.getElementById('scene-reward').classList.add('hidden');
+    document.getElementById('scene-vault').classList.remove('hidden');
+    gsap.from('#scene-vault',{opacity:0, duration:.8});
+  }});
+});
+
+/* ============ GIFT VAULT CARDS ============ */
+const cards=document.querySelectorAll('.crystal-card');
+let flippedCount=0;
+cards.forEach(c=>{
+  c.addEventListener('click', ()=>{
+    if(!c.classList.contains('flipped')){
+      c.classList.add('flipped');
+      flippedCount++;
+      if(flippedCount===cards.length){
+        const btn=document.getElementById('btn-letter');
+        btn.classList.remove('hidden');
+        gsap.from(btn,{opacity:0,y:10,duration:.5});
+      }
+    }
+  });
+});
+
+document.getElementById('btn-letter').addEventListener('click', ()=>{
+  gsap.to('#scene-vault',{opacity:0, duration:.5, onComplete:()=>{
+    document.getElementById('scene-vault').classList.add('hidden');
+    document.getElementById('scene-letter').classList.remove('hidden');
+    gsap.from('#letter-paper',{rotationX:-90, duration:.9, ease:'power2.out'});
+    gsap.to('#letter-paper p',{opacity:1, y:0, duration:.5, stagger:.35, delay:.6, from:{y:10}});
+    setTimeout(()=>{
+      const hb=document.getElementById('btn-to-hug');
+      hb.classList.remove('hidden');
+      gsap.from(hb,{opacity:0,y:10,duration:.5});
+    }, 3200);
+  }});
+});
+
+document.getElementById('btn-to-hug').addEventListener('click', ()=>{
+  gsap.to('#scene-letter',{opacity:0, duration:.5, onComplete:()=>{
+    document.getElementById('scene-letter').classList.add('hidden');
+    document.getElementById('scene-hug').classList.remove('hidden');
+    gsap.from('.section-eyebrow, .section-title', {opacity:0, y:-10, duration:.5});
+    gsap.to('#hug-gif-wrap',{opacity:1, y:0, duration:.6, ease:'back.out(1.5)', delay:.15});
+  }});
+});
+
+/* ============ HUG SEQUENCE ============ */
+document.getElementById('btn-hug').addEventListener('click', (e)=>{
+  const btn=e.target;
+  btn.disabled=true;
+  for(let i=0;i<16;i++){
+    const h=document.createElement('div');
+    h.className='heart'; h.textContent=['💛','⭐','🎈'][i%3];
+    h.style.left=rand(20,80)+'%'; h.style.top='60%';
+    document.getElementById('scene-hug').appendChild(h);
+    gsap.to(h,{opacity:1, y:-120, x:rand(-40,40), duration:1.4, delay:i*0.05, ease:'power1.out', onComplete:()=>{
+      gsap.to(h,{opacity:0, duration:.4, onComplete:()=>h.remove()});
+    }});
+  }
+  setTimeout(()=>{
+    gsap.to('#scene-hug',{opacity:0, duration:.8, onComplete:()=>{
+      document.getElementById('scene-hug').classList.add('hidden');
+      document.getElementById('scene-end').classList.remove('hidden');
+      gsap.from('#end-star',{scale:0, rotation:-15, duration:.7, ease:'back.out(1.7)'});
+      gsap.from('#scene-end h1',{opacity:0, y:20, duration:.8, delay:.3});
+      gsap.from('#scene-end .sub',{opacity:0, y:20, duration:.8, delay:.6});
+      setTimeout(()=>{
+        gsap.to('#fade-black',{opacity:1, duration:2, delay:1});
+      }, 1500);
+    }});
+  }, 1800);
+});
+</script>
+</body>
+</html>

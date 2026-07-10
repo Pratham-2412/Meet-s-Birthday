@@ -1019,78 +1019,58 @@ likeList.forEach(text=>{
 });
 
 /* ============================================================
-   MUSIC BOX AUDIO SYNTHESIZER (Web Audio API)
-============================================================ */
-let audioCtx = null;
-let musicPlaying = false;
-let melodyTimeout = null;
+   BACKGROUND MUSIC PLAYER (audio2.mpeg)
+   ============================================================ */
+const bgMusic = new Audio('audio2.mpeg');
+bgMusic.loop = true;
+let musicPlaying = true; // initially on!
 
-const birthdayMelody = [
-  { note: 'C4', dur: 0.5 }, { note: 'C4', dur: 0.5 }, { note: 'D4', dur: 1 }, { note: 'C4', dur: 1 }, { note: 'F4', dur: 1 }, { note: 'E4', dur: 2 },
-  { note: 'C4', dur: 0.5 }, { note: 'C4', dur: 0.5 }, { note: 'D4', dur: 1 }, { note: 'C4', dur: 1 }, { note: 'G4', dur: 1 }, { note: 'F4', dur: 2 },
-  { note: 'C4', dur: 0.5 }, { note: 'C4', dur: 0.5 }, { note: 'C5', dur: 1 }, { note: 'A4', dur: 1 }, { note: 'F4', dur: 1 }, { note: 'E4', dur: 1 }, { note: 'D4', dur: 2 },
-  { note: 'A#4', dur: 0.5 }, { note: 'A#4', dur: 0.5 }, { note: 'A4', dur: 1 }, { note: 'F4', dur: 1 }, { note: 'G4', dur: 1 }, { note: 'F4', dur: 2 }
-];
+// Update music button visual state to playing initially
+document.getElementById('musicToggle').classList.add('playing');
 
-const noteFreqs = {
-  'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'A#4': 466.16, 'C5': 523.25
-};
-
-function playNote(freq, start, duration) {
-  if (!audioCtx) return;
-  const osc1 = audioCtx.createOscillator();
-  const osc2 = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-  
-  osc1.type = 'triangle';
-  osc1.frequency.value = freq;
-  
-  osc2.type = 'sine';
-  osc2.frequency.value = freq * 2;
-  
-  gainNode.gain.setValueAtTime(0, start);
-  gainNode.gain.linearRampToValueAtTime(0.12, start + 0.02);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, start + duration - 0.04);
-  
-  osc1.connect(gainNode);
-  osc2.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-  
-  osc1.start(start);
-  osc2.start(start);
-  osc1.stop(start + duration);
-  osc2.stop(start + duration);
+// Attempt to autoplay on page load (browsers may block this until interaction)
+function startAutoplay() {
+  if (musicPlaying) {
+    bgMusic.play().then(() => {
+      removeInteractionListeners();
+    }).catch(err => {
+      console.log("Autoplay waiting for user interaction...");
+    });
+  }
 }
 
-let currentNoteIndex = 0;
-function playMelodyLoop() {
-  if (!musicPlaying) return;
-  const note = birthdayMelody[currentNoteIndex];
-  const freq = noteFreqs[note.note];
-  const duration = note.dur * 0.7;
-  
-  playNote(freq, audioCtx.currentTime, duration);
-  
-  currentNoteIndex = (currentNoteIndex + 1) % birthdayMelody.length;
-  melodyTimeout = setTimeout(playMelodyLoop, note.dur * 700);
+// Start playing on first click/touch anywhere to bypass autoplay restriction
+function handleUserInteraction() {
+  if (musicPlaying && bgMusic.paused) {
+    bgMusic.play().then(() => {
+      removeInteractionListeners();
+    });
+  }
 }
+
+function removeInteractionListeners() {
+  document.removeEventListener('click', handleUserInteraction);
+  document.removeEventListener('touchstart', handleUserInteraction);
+  document.removeEventListener('keydown', handleUserInteraction);
+}
+
+document.addEventListener('click', handleUserInteraction);
+document.addEventListener('touchstart', handleUserInteraction);
+document.addEventListener('keydown', handleUserInteraction);
+
+// Attempt immediately
+startAutoplay();
 
 const musicToggle = document.getElementById('musicToggle');
-musicToggle.addEventListener('click', () => {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
+musicToggle.addEventListener('click', (e) => {
+  e.stopPropagation(); // prevent triggering the document click handler
   musicPlaying = !musicPlaying;
   musicToggle.classList.toggle('playing', musicPlaying);
   
   if (musicPlaying) {
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-    currentNoteIndex = 0;
-    playMelodyLoop();
+    bgMusic.play();
   } else {
-    clearTimeout(melodyTimeout);
+    bgMusic.pause();
   }
 });
 

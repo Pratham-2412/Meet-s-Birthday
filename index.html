@@ -197,8 +197,15 @@ button{font-family:inherit; cursor:pointer;}
 #page-indicator{font-family:'Caveat',cursive;font-size:1.3rem;color:var(--ink-soft);min-width:80px;text-align:center;}
 
 /* ============ SHARED PAGE COMPONENTS ============ */
-.page-title{font-family:'Caveat',cursive;font-size:clamp(1.7rem,5vw,2.6rem);color:var(--ink);margin:0 0 6px;text-align:center;}
-.page-kicker{text-align:center;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:16px;}
+.page-title{font-family:'Caveat',cursive;font-size:clamp(1.7rem,5vw,2.6rem);color:var(--ink);margin:0 0 6px;text-align:center;transition:opacity 0.4s, visibility 0.4s;}
+.page-kicker{text-align:center;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:16px;transition:opacity 0.4s, visibility 0.4s;}
+
+.bunting-banner.show ~ .cake-wrap .page-kicker,
+.bunting-banner.show ~ .cake-wrap .page-title {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
 
 /* COVER */
 .cover-wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
@@ -429,7 +436,7 @@ button{font-family:inherit; cursor:pointer;}
 
 /* CAKE */
 .cake-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;}
-.cake{position:relative;width:clamp(140px,42vw,180px);margin:45px auto 15px;}
+.cake{position:relative;width:clamp(140px,42vw,180px);margin:45px auto 15px;touch-action:manipulation;user-select:none;}
 .tier{border-radius:10px;margin:0 auto;box-shadow:var(--shadow-sm);position:relative;width:100%;}
 .tier1{height:46px;background:linear-gradient(180deg,var(--peach),#e79878);z-index:1;margin-top:-6px;}
 .tier2{width:78%;height:42px;background:linear-gradient(180deg,var(--pink),#dd8b9a);margin-top:-6px;z-index:2;}
@@ -450,7 +457,10 @@ button{font-family:inherit; cursor:pointer;}
   height:32px;
   background: repeating-linear-gradient(45deg, var(--lavender), var(--lavender) 4px, #fff 4px, #fff 8px);
   border-radius:3px;
+  cursor:pointer;
   z-index:10;
+  touch-action:manipulation;
+  user-select:none;
 }
 .flame{
   position:absolute;
@@ -489,7 +499,6 @@ button{font-family:inherit; cursor:pointer;}
   z-index: 10;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.4s;
 }
 .bunting-banner.show {
   opacity: 1;
@@ -520,6 +529,7 @@ button{font-family:inherit; cursor:pointer;}
   transform-origin: top center;
   padding-bottom: clamp(4px, 1.2vw, 6px);
   opacity: 0;
+  will-change: transform, opacity;
 }
 .bunting-row::before {
   content: '';
@@ -716,9 +726,9 @@ button{font-family:inherit; cursor:pointer;}
         <p class="page-kicker">Page Seven</p>
         <h2 class="page-title">Make a Wish 🎉</h2>
         <div class="cake" id="cakeEl">
-          <div class="candle" style="left:38%" id="c1"><div class="flame"></div></div>
-          <div class="candle" style="left:48%" id="c2"><div class="flame"></div></div>
-          <div class="candle" style="left:58%" id="c3"><div class="flame"></div></div>
+          <div class="candle" style="left:40%" id="c1"><div class="flame"></div></div>
+          <div class="candle" style="left:50%" id="c2"><div class="flame"></div></div>
+          <div class="candle" style="left:60%" id="c3"><div class="flame"></div></div>
           <div class="tier tier3"></div>
           <div class="tier tier2"></div>
           <div class="tier tier1"></div>
@@ -1074,6 +1084,8 @@ musicToggle.addEventListener('click', (e) => {
   }
 });
 
+let audioCtx = null;
+
 function playPuffSound() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1113,6 +1125,9 @@ function playPuffSound() {
 function launchFirework(x, y) {
   const colors = ['#F0A8B4','#F3B79D','#F2CB6E','#AFC4A0','#C9B8DE','#FFF'];
   const container = document.getElementById('ambient');
+  if (!container) return;
+  const fragment = document.createDocumentFragment();
+  const elements = [];
   
   for(let i=0; i<25; i++) {
     const p = document.createElement('div');
@@ -1123,8 +1138,12 @@ function launchFirework(x, y) {
     p.style.width = '6px';
     p.style.height = '6px';
     
-    container.appendChild(p);
-    
+    fragment.appendChild(p);
+    elements.push(p);
+  }
+  container.appendChild(fragment);
+  
+  elements.forEach((p, i) => {
     const angle = (i / 25) * Math.PI * 2;
     const speed = 40 + Math.random() * 80;
     const tx = Math.cos(angle) * speed;
@@ -1139,7 +1158,7 @@ function launchFirework(x, y) {
       ease: 'power2.out',
       onComplete: () => p.remove()
     });
-  }
+  });
 }
 
 /* envelope */
@@ -1197,6 +1216,8 @@ function checkAllBlown(){
 }
 function launchCelebration(){
   const colors=['#F0A8B4','#F3B79D','#F2CB6E','#AFC4A0','#C9B8DE'];
+  const fragment = document.createDocumentFragment();
+  const elements = [];
   
   // Fullscreen Confetti Shower (appended to body so it falls ON TOP of the card)
   for(let i=0; i<85; i++){
@@ -1210,8 +1231,12 @@ function launchCelebration(){
     c.style.height = size + 'px';
     c.style.borderRadius = Math.random()>0.5?'50%':'2px';
     
-    document.body.appendChild(c);
-    
+    fragment.appendChild(c);
+    elements.push(c);
+  }
+  document.body.appendChild(fragment);
+  
+  elements.forEach(c => {
     gsap.to(c,{
       y: window.innerHeight + 50, 
       x: '+=' + (Math.random()*200-100), 
@@ -1221,7 +1246,7 @@ function launchCelebration(){
       ease: 'power1.out', 
       onComplete: () => c.remove()
     });
-  }
+  });
   
   // Fullscreen Background Fireworks Bursts
   const w = window.innerWidth;

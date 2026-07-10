@@ -652,35 +652,27 @@ button{font-family:inherit; cursor:pointer;}
       <div class="notes-grid" id="shayariGrid"></div>
     </section>
 
-    <!-- PAGE 3: PICKUP LINES -->
+    <!-- PAGE 3: GALLERY -->
     <section class="page" data-page="2">
       <div class="paper-tex"></div>
       <p class="page-kicker">Page Three</p>
-      <h2 class="page-title">Tap to Flip 😏</h2>
-      <div class="notes-grid" id="pickupGrid"></div>
-    </section>
-
-    <!-- PAGE 4: GALLERY -->
-    <section class="page" data-page="3">
-      <div class="paper-tex"></div>
-      <p class="page-kicker">Page Four</p>
       <h2 class="page-title">Our Little Memories</h2>
       <div class="gallery-wrap" id="galleryWrap"></div>
     </section>
 
-    <!-- PAGE 5: CHECKLIST -->
-    <section class="page" data-page="4">
+    <!-- PAGE 4: CHECKLIST -->
+    <section class="page" data-page="3">
       <div class="paper-tex"></div>
-      <p class="page-kicker">Page Five</p>
+      <p class="page-kicker">Page Four</p>
       <h2 class="page-title">Things I Like About You</h2>
       <ul class="checklist" id="checklist"></ul>
     </section>
 
-    <!-- PAGE 6: ENVELOPE -->
-    <section class="page" data-page="5">
+    <!-- PAGE 5: ENVELOPE -->
+    <section class="page" data-page="4">
       <div class="paper-tex"></div>
       <div class="env-wrap">
-        <p class="page-kicker">Page Six · A Secret</p>
+        <p class="page-kicker">Page Five · A Secret</p>
         <div class="envelope" id="envelope">
           <div class="env-back"></div>
           <div class="env-letter" id="envLetter">
@@ -700,8 +692,8 @@ button{font-family:inherit; cursor:pointer;}
       </div>
     </section>
 
-    <!-- PAGE 7: CAKE -->
-    <section class="page" data-page="6">
+    <!-- PAGE 6: CAKE -->
+    <section class="page" data-page="5">
       <div class="paper-tex"></div>
       <div class="bunting-banner" id="hbdBanner">
         <div class="bunting-row row-1">
@@ -723,7 +715,7 @@ button{font-family:inherit; cursor:pointer;}
         </div>
       </div>
       <div class="cake-wrap">
-        <p class="page-kicker">Page Seven</p>
+        <p class="page-kicker">Page Six</p>
         <h2 class="page-title">Make a Wish 🎉</h2>
         <div class="cake" id="cakeEl">
           <div class="candle" style="left:40%" id="c1"><div class="flame"></div></div>
@@ -738,8 +730,8 @@ button{font-family:inherit; cursor:pointer;}
       </div>
     </section>
 
-    <!-- PAGE 8: FINAL LETTER -->
-    <section class="page" data-page="7">
+    <!-- PAGE 7: FINAL LETTER -->
+    <section class="page" data-page="6">
       <div class="paper-tex"></div>
       <div class="letter-wrap">
         <div class="letter-paper">
@@ -935,26 +927,16 @@ const shayariList = [
   "Zindagi ke safar mein tu wo insaan hai jise main kabhi replace nahi kar sakti.",
   "Tera birthday hai, toh aaj sirf tu spoil hoga — kal se wapas normal.",
   "Kabhi hasa ke, kabhi chida ke, tu hamesha mera favourite banaya rehta hai.",
-  "Umar badh rahi hai tumhari, par maturity — abhi bhi missing hai (jokes apart, love you).",
+  "Umar badh rahi hai tumhari, par maturity — abhi bhi missing hai (jokes apart, stay awesome!).",
   "Yeh saal tumhare liye laaye khushiyan itni, ki gine na sako — happy birthday!"
 ];
 
-const pickupLines = [
-  {front:"Are you a candle?", back:"Because you just lit up this whole page 🕯️"},
-  {front:"Wait, are you WiFi?", back:"Because I'm feeling a real connection right now 📶"},
-  {front:"Excuse me, are you a parking ticket?", back:"Because you've got FINE written all over you 😏"},
-  {front:"Are you a birthday cake?", back:"Because I want a slice of you 🎂"},
-  {front:"Do you have a map?", back:"I keep getting lost in your texts 🗺️"},
-  {front:"Are you made of copper and tellurium?", back:"Because you're Cu-Te ⚗️"},
-  {front:"Is your name Google?", back:"Because you have everything I've been searching for 🔍"},
-  {front:"Are you a time traveler?", back:"Because I can totally see you in my future 🔮"}
-];
 
 const gallery = [
-  {src:'meet1.jpeg', cap:'your brightest, most beautiful smile ✨'},
-  {src:'meet2.jpeg', cap:'that sweet candid moment 📸'},
-  {src:'meet3.jpeg', cap:'unmatched vibe and energy 😎'},
-  {src:'meet4.jpeg', cap:'celebrating you, today and always 🎂'}
+  {src:'meet1.jpeg', cap:'The trip that only we remember'},
+  {src:'meet2.jpeg', cap:'Around you I am always smiling'},
+  {src:'meet3.jpeg', cap:'You are picture perfect'},
+  {src:'meet4.jpeg', cap:'The way I clicked your perfect picture in goa'}
 ];
 
 const likeList = [
@@ -982,18 +964,7 @@ shayariList.forEach((line,i)=>{
   shayariGrid.appendChild(note);
 });
 
-const pickupGrid = document.getElementById('pickupGrid');
-pickupLines.forEach(item=>{
-  const card = document.createElement('div');
-  card.className='flip-card';
-  card.innerHTML = `
-    <div class="flip-inner">
-      <div class="flip-face flip-front">${item.front}</div>
-      <div class="flip-face flip-back">${item.back}</div>
-    </div>`;
-  card.addEventListener('click', ()=> card.classList.toggle('flipped'));
-  pickupGrid.appendChild(card);
-});
+
 
 const galleryWrap = document.getElementById('galleryWrap');
 const lightbox = document.getElementById('lightbox');

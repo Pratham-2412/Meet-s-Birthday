@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For You, Nishantu 🌸</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --rose: #ff4d7d;
+            --rose-light: #ff85a2;
+            --blush: #ffd6e0;
+            --cream: #fff5f7;
+            --text: #3d2c35;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background blobs */
+        .bg-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.35;
+            animation: blobMove 8s ease-in-out infinite alternate;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .blob1 { width: 400px; height: 400px; background: #ffb3c6; top: -100px; left: -100px; animation-delay: 0s; }
+        .blob2 { width: 350px; height: 350px; background: #ffd6e0; bottom: -80px; right: -80px; animation-delay: 2s; }
+        .blob3 { width: 200px; height: 200px; background: #ff85a2; top: 40%; left: 50%; animation-delay: 4s; }
+
+        @keyframes blobMove {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 20px) scale(1.1); }
+        }
+
+        /* Floating hearts bg */
+        .hearts-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .heart-float {
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0.18;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0.18; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* CARD */
+        .card {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 2.5px solid rgba(255,255,255,0.9);
+            border-radius: 40px;
+            padding: 40px 32px 36px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(255,77,125,0.18), 0 0 0 8px rgba(255,180,200,0.15);
+            width: 92%;
+            max-width: 420px;
+            position: relative;
+            z-index: 10;
+            animation: cardIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes cardIn {
+            0% { opacity: 0; transform: scale(0.7) translateY(40px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Name tag */
+        .name-tag {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--rose), var(--rose-light));
+            color: white;
+            padding: 8px 28px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 8px 20px rgba(255,77,125,0.35);
+            white-space: nowrap;
+            animation: tagPop 0.5s 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes tagPop {
+            0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+            100% { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        /* Media box (image / gif / video) */
+        .gif-container {
+            width: 100%;
+            height: 190px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0 18px;
+        }
+        .gif-container img,
+        .gif-container video {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 20px rgba(255,77,125,0.2));
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--rose), #ff9eb5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .sub-name {
+            font-size: 1.3rem;
+            color: var(--rose-light);
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        p {
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.65;
+            margin-bottom: 28px;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+
+        /* Stars deco */
+        .stars {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            letter-spacing: 4px;
+            animation: twinkle 2s ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.15); }
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            align-items: center;
+            min-height: 72px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, var(--rose), var(--rose-light));
+            color: white;
+            box-shadow: 0 10px 28px rgba(255,77,125,0.45);
+        }
+        .btn-yes:hover { transform: scale(1.08); box-shadow: 0 14px 35px rgba(255,77,125,0.55); }
+        .btn-yes:active { transform: scale(0.97); }
+
+        .btn-no {
+            background: white;
+            color: #ccc;
+            border: 2px solid #f0e0e6;
+            font-size: 0.85rem;
+        }
+
+
+        /* Hint bubble */
+        #hint-bubble {
+            position: absolute;
+            top: -54px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: linear-gradient(135deg, var(--rose), var(--rose-light));
+            color: white;
+            padding: 9px 18px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            opacity: 0;
+            transition: 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #hint-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid var(--rose-light);
+        }
+        .show-hint { opacity: 1 !important; transform: translateX(-50%) translateY(0) !important; }
+
+        /* Success */
+        .hidden { display: none !important; }
+
+        #success-content h1 { font-size: 3.2rem; }
+        .success-hearts {
+            font-size: 2rem;
+            letter-spacing: 8px;
+            margin-bottom: 16px;
+            animation: heartBeat 1.2s ease-in-out infinite;
+        }
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Floating particle */
+        .floating-deco {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            animation: fly 4s linear forwards;
+        }
+        @keyframes fly {
+            0% { transform: translateY(0) scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) scale(1.8) rotate(360deg); opacity: 0; }
+        }
+
+        /* Ribbon corners */
+        .corner-deco {
+            position: absolute;
+            font-size: 1.6rem;
+            pointer-events: none;
+            animation: wiggle 3s ease-in-out infinite alternate;
+        }
+        .corner-deco.tl { top: 14px; left: 18px; animation-delay: 0s; }
+        .corner-deco.tr { top: 14px; right: 18px; animation-delay: 0.5s; }
+        .corner-deco.bl { bottom: 14px; left: 18px; animation-delay: 1s; }
+        .corner-deco.br { bottom: 14px; right: 18px; animation-delay: 1.5s; }
+        @keyframes wiggle {
+            0% { transform: rotate(-10deg) scale(1); }
+            100% { transform: rotate(10deg) scale(1.15); }
+        }
+
+        /* ========== CATCH-THE-HEARTS GAME ========== */
+        #game-layer {
+            position: fixed; inset: 0; z-index: 500;
+            background: radial-gradient(120% 90% at 50% 0%, #ffd6e0, #ff9eb5);
+            display: none; overflow: hidden; touch-action: manipulation;
+        }
+        #game-layer.on { display: block; }
+        .g-hud {
+            position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+            padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+            font-family: 'Dancing Script', cursive; font-size: 1.9rem; color: #fff;
+            text-shadow: 0 2px 8px rgba(255,77,125,.5);
+        }
+        .g-bar { flex: 1; height: 12px; background: rgba(255,255,255,.4); border-radius: 10px; overflow: hidden; }
+        .g-bar i { display: block; height: 100%; width: 0; background: #fff; transition: width .25s; }
+        .g-tip { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; color: #fff; font-weight: 700; z-index: 3; }
+        .g-toast {
+            position: absolute; left: 50%; top: 42%; transform: translate(-50%, 0);
+            width: min(86vw, 360px); text-align: center; z-index: 2; pointer-events: none;
+            font-family: 'Dancing Script', cursive; font-size: 2.1rem; line-height: 1.25; color: #fff;
+            text-shadow: 0 3px 14px rgba(200,30,80,.55); opacity: 0;
+        }
+        .g-toast.show { animation: toastIn 1.6s ease-out forwards; }
+        @keyframes toastIn { 0% { opacity: 0; transform: translate(-50%, 14px) scale(.92); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+        .g-heart {
+            position: absolute; top: -70px; line-height: 1; border: 0; background: none;
+            cursor: pointer; user-select: none; animation: gFall linear forwards;
+        }
+        @keyframes gFall { to { transform: translateY(120vh) rotate(25deg); } }
+        .g-pop { position: absolute; pointer-events: none; font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: #fff; animation: gPop .7s ease-out forwards; }
+        @keyframes gPop { to { transform: translateY(-50px); opacity: 0; } }
+
+        /* ========== LETTER + VIDEOS ========== */
+        #letter-layer {
+            position: fixed; inset: 0; z-index: 400;
+            background: linear-gradient(180deg, #fff5f7, #ffd6e0);
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            display: none; padding: 40px 20px 60px;
+        }
+        #letter-layer.on { display: block; }
+        .l-wrap { max-width: 560px; margin: 0 auto; text-align: center; }
+        .l-wrap h1 { font-size: 3rem; margin-bottom: 18px; }
+        .paper {
+            background: #fff; border-radius: 22px; padding: 30px 26px; text-align: left;
+            box-shadow: 0 20px 50px rgba(255,77,125,.2); border: 2px solid #ffe3ea;
+        }
+        .paper h2 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--rose); margin-bottom: 12px; }
+        .paper p { margin-bottom: 1.1em; line-height: 1.75; font-weight: 600; opacity: .92; }
+        .paper strong { background: linear-gradient(transparent 55%, #ffc9d6 55%); }
+        .sign { font-family: 'Dancing Script', cursive; font-size: 2rem; color: var(--rose); }
+        .l-sub { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--rose); margin: 34px 0 14px; }
+        .l-end { font-family: 'Dancing Script', cursive; font-size: 2.3rem; color: var(--rose); margin: 34px 0 18px; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-blob blob1"></div>
+    <div class="bg-blob blob2"></div>
+    <div class="bg-blob blob3"></div>
+
+    <div class="hearts-bg" id="hearts-bg"></div>
+
+    <div class="card">
+        <span class="corner-deco tl">🌸</span>
+        <span class="corner-deco tr">💖</span>
+        <span class="corner-deco bl">✨</span>
+        <span class="corner-deco br">🌷</span>
+
+        <div class="name-tag">💌 For Nishantu 💌</div>
+
+        <div id="request-content">
+            <div class="gif-container">
+                <video id="main-gif" src="a2.mp4" autoplay muted loop playsinline></video>
+            </div>
+
+            <div class="stars">⭐ ✨ ⭐</div>
+            <h1>Forgive me,</h1>
+            <span class="sub-name">Nishantu? 🥺</span>
+            <p>I'm really truly deeply sorry.<br>I promise to love you 100x more and never mess up again. Please give me one more chance? 💕</p>
+
+            <div class="btn-group">
+                <button class="btn btn-yes" id="yes-btn" onclick="celebrate()">Yes! 💕</button>
+                <div style="position: relative;">
+                    <div id="hint-bubble">Pleaseeee? 🥺</div>
+                    <button class="btn btn-no" id="no-btn" onclick="handleNoFirstClick()" onmouseover="handleNoHover()">No 😢</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Game -->
+    <div id="game-layer">
+        <div class="g-hud"><span id="g-score">0 / 12</span><div class="g-bar"><i id="g-fill"></i></div></div>
+        <div id="g-field"></div>
+        <div class="g-toast" id="g-toast"></div>
+        <div class="g-tip">Tap the hearts before they fall 💗</div>
+    </div>
+
+    <!-- Letter + videos -->
+    <div id="letter-layer">
+        <div class="l-wrap">
+            <h1>You caught them all!</h1>
+            <div class="gif-container">
+                <video src="a3.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <article class="paper">
+                <h2>Dear Nishantu,</h2>
+                <p>Baby, I know sometimes I get on your nerves, annoy you, and make things difficult when all I really want is to love you. ❤️🥺 Maybe I don’t always know how to express everything I feel, and sometimes it comes out in the most annoying ways, but beneath all of that is a heart that loves you more than you probably realise.</p>
+                <p>I want you to know that no matter how difficult life gets, no matter how heavy things feel, or how alone you might feel sometimes, you will always have me. You don’t have to figure everything out on your own. You don’t always have to be strong with me. On the days when you feel like the world is too much, I want to be the person you can come home to, the person who listens, holds you, and reminds you that you don’t have to face everything alone.</p>
+                <p>I know I’m not perfect at loving you, and I might not always get things right, but my love for you is so much deeper than my ability to express it. I want to keep learning you, understanding you, and loving you in the ways your heart needs. I want to be there not just when everything is beautiful and easy, but also when things are messy, when we’re upset with each other, and when life tests us.</p>
+                <p>And maybe I annoy you because I want so much of you, your attention, your time, your hugs, your everything. 🥹❤️ But it’s only because you mean so much to me. If I could make one thing certain in your heart, it would be this: <strong>you are loved, you are wanted, and you never have to feel like you’re alone in this world because you have me.</strong></p>
+                <p>I love you endlessly, baby. Not just for who you are on your best days, but for all the little pieces of you that make you who you are. And even when I get on your nerves, please remember that there’s a girl here who loves you with all her heart and who just wants to make sure you never have to question whether you have someone by your side. You have me, my love. Today, tomorrow, and through all the little tomorrows we get together. ❤️🫂</p>
+                <div class="sign">Yours, always 💌</div>
+            </article>
+
+            <div class="l-end">I love you, Nishantu ❤️</div>
+        </div>
+    </div>
+
+    <script>
+        // Background floating hearts
+        const heartsBg = document.getElementById('hearts-bg');
+        const emojis = ['💗', '💕', '🌸', '✨', '🌷', '💖', '🫧'];
+        for (let i = 0; i < 20; i++) {
+            const el = document.createElement('div');
+            el.className = 'heart-float';
+            el.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.animationDuration = (6 + Math.random() * 10) + 's';
+            el.style.animationDelay = (Math.random() * 10) + 's';
+            el.style.fontSize = (0.8 + Math.random() * 1.4) + 'rem';
+            heartsBg.appendChild(el);
+        }
+
+        let interactionStage = 0;
+        const noBtn = document.getElementById('no-btn');
+        const yesBtn = document.getElementById('yes-btn');
+        const mainGif = document.getElementById('main-gif');
+        const title = document.querySelector('#request-content h1');
+        const subName = document.querySelector('.sub-name');
+        const desc = document.querySelector('#request-content p');
+        const hint = document.getElementById('hint-bubble');
+
+        function handleNoFirstClick() {
+            if (interactionStage === 0) {
+                interactionStage = 1;
+                mainGif.src = "a1.mp4";
+                mainGif.play();
+                title.innerText = "Are you sure,";
+                subName.innerText = "Nishantu? 😿";
+                desc.innerText = "Look at these sad eyes... My heart is breaking! Please give us another chance 💔";
+                hint.classList.add('show-hint');
+                yesBtn.style.transform = "scale(1.2)";
+            }
+        }
+
+        function handleNoHover() {
+            if (interactionStage >= 1) {
+                moveNoButton();
+            }
+        }
+
+        function moveNoButton() {
+            hint.classList.remove('show-hint');
+            noBtn.style.position = 'fixed';
+            const padding = 180;
+            const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+            noBtn.style.left = Math.max(padding / 2, Math.floor(Math.random() * maxX)) + 'px';
+            noBtn.style.top  = Math.max(padding / 2, Math.floor(Math.random() * maxY)) + 'px';
+            noBtn.style.zIndex = "1000";
+
+            let currentScale = parseFloat((yesBtn.style.transform || 'scale(1.2)').replace('scale(','')) || 1.2;
+            if (currentScale < 2.5) {
+                yesBtn.style.transform = `scale(${(currentScale + 0.12).toFixed(2)})`;
+            }
+        }
+
+        function celebrate() {
+            noBtn.style.display = 'none';
+            for (let i = 0; i < 40; i++) {
+                setTimeout(createParticle, i * 45);
+            }
+            setTimeout(startGame, 900);
+        }
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            const icons = ['🌸', '💖', '✨', '💕', '🌷', '🧸', '💗', '⭐', '🫧'];
+            particle.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            particle.className = 'floating-deco';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.bottom = '-5vh';
+            particle.style.fontSize = (16 + Math.random() * 22) + 'px';
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 4000);
+        }
+
+        /* ========== yes -> game -> letter ========== */
+        const SORRY = [
+            "I’m sorry for every time I annoyed you 🥺",
+            "Sorry for making things difficult ❤️",
+            "I’m sorry I don’t always say it right 💔",
+            "Sorry for the days I made you feel alone 😢",
+            "I’m sorry, my love. Truly. 💕",
+            "Sorry for wanting so much of you 🥹",
+            "I’m sorry for the little fights 🫂",
+            "Sorry for every time I got it wrong 🌷",
+            "I’m sorry and I’m learning you, baby ✨",
+            "Sorry for the heavy days ❤️",
+            "I’m sorry, and I’m not going anywhere 💖",
+            "Last one: sorry, Nishantu. I love you. 💌"
+        ];
+        const GOAL = SORRY.length;
+        let caught = 0, timer = null;
+        const gameLayer = document.getElementById('game-layer');
+        const field = document.getElementById('g-field');
+        const letter = document.getElementById('letter-layer');
+        const toast = document.getElementById('g-toast');
+
+        function updateHud() {
+            document.getElementById('g-score').textContent = caught + ' / ' + GOAL;
+            document.getElementById('g-fill').style.width = (caught / GOAL * 100) + '%';
+        }
+
+        function showSorry(text) {
+            toast.classList.remove('show');
+            void toast.offsetWidth;
+            toast.textContent = text;
+            toast.classList.add('show');
+        }
+
+        function spawn() {
+            const h = document.createElement('button');
+            const icons = ['❤️', '💖', '💗', '💕', '🩷'];
+            h.className = 'g-heart';
+            h.setAttribute('aria-label', 'Catch heart');
+            h.textContent = icons[Math.floor(Math.random() * icons.length)];
+            h.style.left = (4 + Math.random() * 84) + 'vw';
+            h.style.fontSize = (34 + Math.random() * 26) + 'px';
+            h.style.animationDuration = (3.2 + Math.random() * 2.4) + 's';
+            let done = false;
+            h.addEventListener('pointerdown', function (e) {
+                if (done) return; done = true;
+                e.preventDefault();
+                h.remove();
+                showSorry(SORRY[caught]);
+                caught++; updateHud();
+                if (caught >= GOAL) win();
+            });
+            h.addEventListener('animationend', () => h.remove());
+            field.appendChild(h);
+        }
+
+        function startGame() {
+            clearInterval(timer);
+            caught = 0; updateHud(); field.innerHTML = '';
+            gameLayer.classList.add('on');
+            spawn(); timer = setInterval(spawn, 650);
+        }
+
+        function win() {
+            clearInterval(timer);
+            setTimeout(function () {
+                field.innerHTML = '';
+                gameLayer.classList.remove('on');
+                letter.scrollTop = 0;
+                letter.classList.add('on');
+            }, 1700);
+        }
+    </script>
+</body>
+</html>
